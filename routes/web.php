@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\FolderController;
+use App\Http\Controllers\HomeController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -21,9 +22,26 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 
-// home
-Route::get('/folder/{id}/tasks', [TaskController::class, 'index'])->name('tasks.index');
+// top page
+Route::group(['middleware' => 'auth'], function() {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// create
-Route::get('/folder/create', [FolderController::class, 'showCreateForm'])->name('folders.create');
-Route::post('/folder/create', [FolderController::class, 'create']);
+    // show
+    Route::get('/folder/{id}/tasks', [TaskController::class, 'index'])->name('tasks.index');
+
+    // folder create
+    Route::get('/folder/create', [FolderController::class, 'showCreateForm'])->name('folders.create');
+    Route::post('/folder/create', [FolderController::class, 'create']);
+
+    // tasks create
+    Route::get('/folders/{id}/tasks/create', [TaskController::class, 'showCreateForm'])->name('tasks.create');
+    Route::post('/folders/{id}/tasks/create', [TaskController::class, 'create']);
+
+    // tasks edit
+    Route::get('/folders/{id}/tasks/{task_id}/edit', [TaskController::class,'showEditForm'])->name('tasks.edit');
+    Route::post('/folders/{id}/tasks/{task_id}/edit', [TaskController::class, 'edit']);
+
+});
+
+
+Auth::routes();
